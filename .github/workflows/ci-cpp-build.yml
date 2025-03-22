@@ -82,8 +82,11 @@ jobs:
           name: test_results_xml
           path: test-results/
 
-      - name: Install xsltproc
-        run: sudo apt-get install -y xsltproc
+      - name: Update package list
+        run: sudo apt-get update
+
+      - name: Install required packages
+        run: sudo apt-get install -y libxslt1.1 xsltproc
 
       - name: Apply XSLT transformation
         run: |
