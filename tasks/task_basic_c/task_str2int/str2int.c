@@ -1,6 +1,6 @@
 #include "str2int.h"
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
 int str2int(const char* str) {
   const int int_rng_mx = 2147483647;
