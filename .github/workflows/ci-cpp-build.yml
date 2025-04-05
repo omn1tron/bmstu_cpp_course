@@ -99,3 +99,27 @@ jobs:
           path: test-results/*.html
           if-no-files-found: warn
           retention-days: 5
+
+      - name: Check test results
+        run: |
+          # Проверяем, что все тесты прошли успешно
+          any_failed=false
+          for xml_file in test-results/*.xml; do
+            echo "Checking $xml_file"
+            failures=$(xmllint --xpath 'string(//testsuites/@failures)' "$xml_file")
+            errors=$(xmllint --xpath 'string(//testsuites/@errors)' "$xml_file")
+            
+            if [ "$failures" -gt 0 ] || [ "$errors" -gt 0 ]; then
+              echo "::error::Test failures detected in $xml_file: $failures failures, $errors errors"
+              any_failed=true
+            else
+              echo "All tests passed in $xml_file"
+            fi
+          done
+          
+          if [ "$any_failed" = true ]; then
+            echo "::error::Some tests failed"
+            exit 1
+          else
+            echo "All tests passed successfully"
+          fi
