@@ -2,7 +2,7 @@ name: C++ Build, Test, and Generate Report
 
 on:
   push:
-    branches: [main, hw]
+    branches: [main, hw, build_patch]
   pull_request:
     branches: [main, hw]
 
