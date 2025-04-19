@@ -2,7 +2,7 @@ import gdb.printing
 
 class SimpleVectorPrinter:
     def __init__(self, val):
-        self.val = val
+        self.val = val 
 
     def to_string(self):
         try:
