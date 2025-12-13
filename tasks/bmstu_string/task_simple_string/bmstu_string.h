@@ -1,7 +1,11 @@
 #pragma once
+#include <cstddef>
+#include <exception>
+#include <initializer_list>
+#include <ios>
+
 namespace bmstu
 {
-
 template <typename T>
 class basic_string;
 
