@@ -35,6 +35,7 @@
  * - Все 18 тестов должны пройти успешно после полной реализации
  */
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
@@ -111,83 +112,219 @@ class avl_balanced_tree
 							const V& value,
 							tree_node<K, V>*& node)
 	{
-		// TODO: Реализовать вставку узла в AVL дерево
 		// 1. Если node == nullptr, создать новый узел
-		// 2. Рекурсивно вставить в левое или правое поддерево в зависимости от
-		// ключа
-		// 3. Обновить значение, если ключ уже существует
+		if (node == nullptr)
+		{
+			node = new tree_node<K, V>(key, value);
+			size_++;
+			return node;
+		}
+
+		// 2. Рекурсивно вставить в левое или правое поддерево в зависимости от ключа
+		if (key < node->key)
+		{
+			insert(key, value, node->left);
+		}
+		else if (key > node->key)
+		{
+			insert(key, value, node->right);
+		}
+		else
+		{
+			// 3. Обновить значение, если ключ уже существует
+			node->value = value;
+			return node;
+		}
+
 		// 4. Вызвать balance(node) для балансировки
-		return nullptr;
+		balance(node);
+		return node;
 	}
 
 	void remove(const K& key, tree_node<K, V>*& node)
 	{
-		// TODO: Реализовать удаление узла из AVL дерева
+		if (node == nullptr)
+		{
+			return;  // Узел не найден
+		}
+
 		// 1. Найти узел с заданным ключом
-		// 2. Обработать 4 случая:
-		//    - Узел без детей (лист)
-		//    - Узел с одним ребенком (левым или правым)
-		//    - Узел с двумя детьми (заменить на минимальный из правого
-		//    поддерева)
-		// 3. Декрементировать size_
+		if (key < node->key)
+		{
+			remove(key, node->left);
+		}
+		else if (key > node->key)
+		{
+			remove(key, node->right);
+		}
+		else
+		{
+			// 2. Обработать случаи удаления
+			// Узел без детей (лист)
+			if (node->left == nullptr && node->right == nullptr)
+			{
+				delete node;
+				node = nullptr;
+				size_--;
+				return;
+			}
+			// Узел с одним ребенком (левым)
+			else if (node->left == nullptr)
+			{
+				tree_node<K, V>* temp = node;
+				node = node->right;
+				delete temp;
+				size_--;
+				return;
+			}
+			// Узел с одним ребенком (правым)
+			else if (node->right == nullptr)
+			{
+				tree_node<K, V>* temp = node;
+				node = node->left;
+				delete temp;
+				size_--;
+				return;
+			}
+			// Узел с двумя детьми (заменить на минимальный из правого поддерева)
+			else
+			{
+				tree_node<K, V>* min_node = findMinPtr(node->right);
+				node->key = min_node->key;
+				node->value = min_node->value;
+				remove(min_node->key, node->right);
+			}
+		}
+
 		// 4. Вызвать balance(node) для балансировки
+		balance(node);
 	}
 
 	tree_node<K, V>* find(const K& key, tree_node<K, V>* node) const
 	{
-		// TODO: Реализовать поиск узла по ключу
-		// Рекурсивно искать в левом или правом поддереве
-		return nullptr;
+		if (node == nullptr || node->key == key)
+		{
+			return node;
+		}
+		if (key < node->key)
+		{
+			return find(key, node->left);
+		}
+		else
+		{
+			return find(key, node->right);
+		}
 	}
 
 	tree_node<K, V>* findMinPtr(tree_node<K, V>* node)
 	{
-		// TODO: Найти узел с минимальным ключом в поддереве
-		// Подсказка: идти влево, пока возможно
-		return nullptr;
+		if (node == nullptr)
+		{
+			return nullptr;
+		}
+		while (node->left != nullptr)
+		{
+			node = node->left;
+		}
+		return node;
 	}
 
 	uint8_t heightOfTree(tree_node<K, V>* t)
 	{
-		// TODO: Вычислить высоту дерева
-		// Высота пустого дерева = 0
-		// Высота дерева = 1 + max(высота левого, высота правого)
-		return 0;
+		if (t == nullptr)
+		{
+			return 0;
+		}
+		return t->height;
 	}
 
 	void rotateWithLeftChild(tree_node<K, V>*& k2)
 	{
-		// TODO: Реализовать правый поворот (rotation with left child)
+		// Правый поворот (rotation with left child)
 		// Используется для балансировки Left-Left случая
+		tree_node<K, V>* k1 = k2->left;
+		k2->left = k1->right;
+		k1->right = k2;
+
+		// Обновляем высоты
+		k2->height = 1 + std::max(heightOfTree(k2->left), heightOfTree(k2->right));
+		k1->height = 1 + std::max(heightOfTree(k1->left), heightOfTree(k1->right));
+
+		k2 = k1;
 	}
 
 	void rotateWithRightChild(tree_node<K, V>*& k1)
 	{
-		// TODO: Реализовать левый поворот (rotation with right child)
+		// Левый поворот (rotation with right child)
 		// Используется для балансировки Right-Right случая
+		tree_node<K, V>* k2 = k1->right;
+		k1->right = k2->left;
+		k2->left = k1;
+
+		// Обновляем высоты
+		k1->height = 1 + std::max(heightOfTree(k1->left), heightOfTree(k1->right));
+		k2->height = 1 + std::max(heightOfTree(k2->left), heightOfTree(k2->right));
+
+		k1 = k2;
 	}
 
 	void doubleWithLeftChild(tree_node<K, V>*& k3)
 	{
-		// TODO: Реализовать двойной поворот Left-Right
+		// Двойной поворот Left-Right
 		// Сначала левый поворот на левом ребенке, затем правый поворот на узле
+		rotateWithRightChild(k3->left);
+		rotateWithLeftChild(k3);
 	}
 
 	void doubleWithRightChild(tree_node<K, V>*& k1)
 	{
-		// TODO: Реализовать двойной поворот Right-Left
+		// Двойной поворот Right-Left
 		// Сначала правый поворот на правом ребенке, затем левый поворот на узле
+		rotateWithLeftChild(k1->right);
+		rotateWithRightChild(k1);
 	}
 
 	void balance(tree_node<K, V>*& t)
 	{
-		// TODO: Реализовать балансировку AVL дерева
-		// 1. Вычислить разность высот левого и правого поддеревьев
-		// 2. Если разность > 1, выполнить соответствующие повороты:
-		//    - Left-Left: rotateWithLeftChild
-		//    - Left-Right: doubleWithLeftChild
-		//    - Right-Right: rotateWithRightChild
-		//    - Right-Left: doubleWithRightChild
+		if (t == nullptr)
+		{
+			return;
+		}
+
+		// Обновляем высоту текущего узла
+		t->height = 1 + std::max(heightOfTree(t->left), heightOfTree(t->right));
+
+		// Вычисляем разность высот
+		int balance_factor = static_cast<int>(heightOfTree(t->left)) - static_cast<int>(heightOfTree(t->right));
+
+		// Left-Left случай: дисбаланс в левом поддереве левого ребенка
+		if (balance_factor > 1 && t->left != nullptr)
+		{
+			int left_balance = static_cast<int>(heightOfTree(t->left->left)) - static_cast<int>(heightOfTree(t->left->right));
+			if (left_balance >= 0)
+			{
+				rotateWithLeftChild(t);
+			}
+			else
+			{
+				// Left-Right случай
+				doubleWithLeftChild(t);
+			}
+		}
+		// Right-Right случай: дисбаланс в правом поддереве правого ребенка
+		else if (balance_factor < -1 && t->right != nullptr)
+		{
+			int right_balance = static_cast<int>(heightOfTree(t->right->left)) - static_cast<int>(heightOfTree(t->right->right));
+			if (right_balance <= 0)
+			{
+				rotateWithRightChild(t);
+			}
+			else
+			{
+				// Right-Left случай
+				doubleWithRightChild(t);
+			}
+		}
 	}
 
 	void inorder_print(tree_node<K, V>* node)
@@ -262,28 +399,85 @@ class map
 		explicit iterator(tree_node<K, V>* root, bool is_end = false)
 			: current_(nullptr), pair_cache_(K{}, V{})
 		{
-			// TODO: Реализовать инициализацию итератора
+			if (is_end || root == nullptr)
+			{
+				current_ = nullptr;
+				return;
+			}
+
 			// Для begin(): нужно найти самый левый узел
-			// Для end(): current_ должен остаться nullptr
+			// Проходим по левым узлам и добавляем их в стек
+			tree_node<K, V>* node = root;
+			while (node != nullptr)
+			{
+				stack_.push(node);
+				node = node->left;
+			}
+
+			// Устанавливаем current_ на самый левый узел (верх стека)
+			if (!stack_.empty())
+			{
+				current_ = stack_.top();
+				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+			}
 		}
 
 		typename iterator::reference operator*() const override
 		{
-			// TODO: Реализовать разыменование
-			// Нужно вернуть std::pair<const K, V> с текущим ключом и значением
+			// Обновляем кэш перед возвратом
+			if (current_ != nullptr)
+			{
+				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+			}
 			return pair_cache_;
 		}
 
 		typename iterator::pointer operator->() const override
 		{
-			// TODO: Реализовать оператор стрелки
+			// Обновляем кэш перед возвратом
+			if (current_ != nullptr)
+			{
+				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+			}
 			return &pair_cache_;
 		}
 
 		iterator& operator++() override
 		{
-			// TODO: Реализовать переход к следующему элементу (in-order)
-			// Подсказка: используйте стек для обхода дерева
+			if (current_ == nullptr || stack_.empty())
+			{
+				current_ = nullptr;
+				return *this;  // Уже в end()
+			}
+
+			// В стеке должен быть current_ на вершине (последний добавленный)
+			// Удаляем его, так как он уже обработан
+			tree_node<K, V>* processed = stack_.top();
+			stack_.pop();
+
+			// Если у обработанного узла есть правое поддерево, обрабатываем его
+			if (processed->right != nullptr)
+			{
+				// Идем вправо, затем максимально влево, добавляя все узлы в стек
+				tree_node<K, V>* node = processed->right;
+				while (node != nullptr)
+				{
+					stack_.push(node);
+					node = node->left;
+				}
+			}
+
+			// Берем следующий узел из стека
+			if (!stack_.empty())
+			{
+				current_ = stack_.top();
+				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+			}
+			else
+			{
+				current_ = nullptr;  // Достигли end()
+			}
+
 			return *this;
 		}
 
