@@ -1,9 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <exception>
+#include <new>
 #include <type_traits>
 #include <utility>
-#include <new>
 
 namespace bmstu
 {
@@ -18,7 +18,10 @@ class bad_optional_access : public std::exception
    public:
 	using exception::exception;
 
-	[[nodiscard]] const char* what() const noexcept override { return "Bad optional access"; }
+	[[nodiscard]] const char* what() const noexcept override
+	{
+		return "Bad optional access";
+	}
 };
 
 template <typename T>
@@ -27,10 +30,7 @@ class optional
    public:
 	optional() = default;
 
-	optional(const T& value) : is_initialized_(true)
-	{
-		new (data_) T(value);
-	}
+	optional(const T& value) : is_initialized_(true) { new (data_) T(value); }
 
 	optional(T&& value) : is_initialized_(true)
 	{
@@ -139,30 +139,15 @@ class optional
 		return *this;
 	}
 
-	T& operator*() &
-	{
-		return *get_ptr();
-	}
+	T& operator*() & { return *get_ptr(); }
 
-	const T& operator*() const&
-	{
-		return *get_ptr();
-	}
+	const T& operator*() const& { return *get_ptr(); }
 
-	T* operator->()
-	{
-		return get_ptr();
-	}
+	T* operator->() { return get_ptr(); }
 
-	const T* operator->() const
-	{
-		return get_ptr();
-	}
+	const T* operator->() const { return get_ptr(); }
 
-	T&& operator*() &&
-	{
-		return std::move(*get_ptr());
-	}
+	T&& operator*() && { return std::move(*get_ptr()); }
 
 	T& value() &
 	{
@@ -222,15 +207,9 @@ class optional
 	[[nodiscard]] bool has_value() const { return is_initialized_; }
 
    private:
-	T* get_ptr()
-	{
-		return reinterpret_cast<T*>(data_);
-	}
+	T* get_ptr() { return reinterpret_cast<T*>(data_); }
 
-	const T* get_ptr() const
-	{
-		return reinterpret_cast<const T*>(data_);
-	}
+	const T* get_ptr() const { return reinterpret_cast<const T*>(data_); }
 
 	alignas(T) uint8_t data_[sizeof(T)];
 	bool is_initialized_ = false;

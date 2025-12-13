@@ -120,7 +120,8 @@ class avl_balanced_tree
 			return node;
 		}
 
-		// 2. Рекурсивно вставить в левое или правое поддерево в зависимости от ключа
+		// 2. Рекурсивно вставить в левое или правое поддерево в зависимости от
+		// ключа
 		if (key < node->key)
 		{
 			insert(key, value, node->left);
@@ -145,7 +146,7 @@ class avl_balanced_tree
 	{
 		if (node == nullptr)
 		{
-			return;  // Узел не найден
+			return;	 // Узел не найден
 		}
 
 		// 1. Найти узел с заданным ключом
@@ -186,7 +187,8 @@ class avl_balanced_tree
 				size_--;
 				return;
 			}
-			// Узел с двумя детьми (заменить на минимальный из правого поддерева)
+			// Узел с двумя детьми (заменить на минимальный из правого
+			// поддерева)
 			else
 			{
 				tree_node<K, V>* min_node = findMinPtr(node->right);
@@ -247,8 +249,10 @@ class avl_balanced_tree
 		k1->right = k2;
 
 		// Обновляем высоты
-		k2->height = 1 + std::max(heightOfTree(k2->left), heightOfTree(k2->right));
-		k1->height = 1 + std::max(heightOfTree(k1->left), heightOfTree(k1->right));
+		k2->height =
+			1 + std::max(heightOfTree(k2->left), heightOfTree(k2->right));
+		k1->height =
+			1 + std::max(heightOfTree(k1->left), heightOfTree(k1->right));
 
 		k2 = k1;
 	}
@@ -262,8 +266,10 @@ class avl_balanced_tree
 		k2->left = k1;
 
 		// Обновляем высоты
-		k1->height = 1 + std::max(heightOfTree(k1->left), heightOfTree(k1->right));
-		k2->height = 1 + std::max(heightOfTree(k2->left), heightOfTree(k2->right));
+		k1->height =
+			1 + std::max(heightOfTree(k1->left), heightOfTree(k1->right));
+		k2->height =
+			1 + std::max(heightOfTree(k2->left), heightOfTree(k2->right));
 
 		k1 = k2;
 	}
@@ -295,12 +301,14 @@ class avl_balanced_tree
 		t->height = 1 + std::max(heightOfTree(t->left), heightOfTree(t->right));
 
 		// Вычисляем разность высот
-		int balance_factor = static_cast<int>(heightOfTree(t->left)) - static_cast<int>(heightOfTree(t->right));
+		int balance_factor = static_cast<int>(heightOfTree(t->left)) -
+							 static_cast<int>(heightOfTree(t->right));
 
 		// Left-Left случай: дисбаланс в левом поддереве левого ребенка
 		if (balance_factor > 1 && t->left != nullptr)
 		{
-			int left_balance = static_cast<int>(heightOfTree(t->left->left)) - static_cast<int>(heightOfTree(t->left->right));
+			int left_balance = static_cast<int>(heightOfTree(t->left->left)) -
+							   static_cast<int>(heightOfTree(t->left->right));
 			if (left_balance >= 0)
 			{
 				rotateWithLeftChild(t);
@@ -314,7 +322,8 @@ class avl_balanced_tree
 		// Right-Right случай: дисбаланс в правом поддереве правого ребенка
 		else if (balance_factor < -1 && t->right != nullptr)
 		{
-			int right_balance = static_cast<int>(heightOfTree(t->right->left)) - static_cast<int>(heightOfTree(t->right->right));
+			int right_balance = static_cast<int>(heightOfTree(t->right->left)) -
+								static_cast<int>(heightOfTree(t->right->right));
 			if (right_balance <= 0)
 			{
 				rotateWithRightChild(t);
@@ -418,7 +427,8 @@ class map
 			if (!stack_.empty())
 			{
 				current_ = stack_.top();
-				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+				new (&pair_cache_) typename iterator::value_type(
+					current_->key, current_->value);
 			}
 		}
 
@@ -427,7 +437,8 @@ class map
 			// Обновляем кэш перед возвратом
 			if (current_ != nullptr)
 			{
-				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+				new (&pair_cache_) typename iterator::value_type(
+					current_->key, current_->value);
 			}
 			return pair_cache_;
 		}
@@ -437,7 +448,8 @@ class map
 			// Обновляем кэш перед возвратом
 			if (current_ != nullptr)
 			{
-				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+				new (&pair_cache_) typename iterator::value_type(
+					current_->key, current_->value);
 			}
 			return &pair_cache_;
 		}
@@ -458,7 +470,8 @@ class map
 			// Если у обработанного узла есть правое поддерево, обрабатываем его
 			if (processed->right != nullptr)
 			{
-				// Идем вправо, затем максимально влево, добавляя все узлы в стек
+				// Идем вправо, затем максимально влево, добавляя все узлы в
+				// стек
 				tree_node<K, V>* node = processed->right;
 				while (node != nullptr)
 				{
@@ -471,11 +484,12 @@ class map
 			if (!stack_.empty())
 			{
 				current_ = stack_.top();
-				new (&pair_cache_) typename iterator::value_type(current_->key, current_->value);
+				new (&pair_cache_) typename iterator::value_type(
+					current_->key, current_->value);
 			}
 			else
 			{
-				current_ = nullptr;  // Достигли end()
+				current_ = nullptr;	 // Достигли end()
 			}
 
 			return *this;
